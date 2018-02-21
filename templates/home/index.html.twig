@@ -132,18 +132,23 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% if locations is defined %}
-        <script>
-            var locations = [];
-            {% for location in locations %}
-            locations.push({
-                address: "{{ location.address }}",
-                lat: {{ location.latitude }},
-                lng: {{ location.longitude }}});
-            {% endfor %}
-            console.log(locations);
-        </script>
-    {% endif %}
+    <script>
+        var locations = [];
+        {% if locations is defined %}
+
+        {% for location in locations %}
+        locations.push({
+            address: "{{ location.address }}",
+            lat: {{ location.latitude }},
+            lng: {{ location.longitude }},
+            markerType: "{{ location.markerType }}",
+            markerColor: "{{ location.markerColor }}"
+        });
+        {% endfor %}
+
+        {% endif %}
+        console.log(locations);
+    </script>
     <script
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzyeRbwaJmvWe_R4b7j4R15Lc8fcw16B0&callback=initMap"
             async defer></script>

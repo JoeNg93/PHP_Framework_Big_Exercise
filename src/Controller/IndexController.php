@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Form\AddressForm;
+use App\Form\AddMarkerForm;
 use App\Entity\Location;
 
 class IndexController extends Controller
@@ -27,17 +27,21 @@ class IndexController extends Controller
     {
         $location = new Location();
 
-        $form = $this->createForm(AddressForm::class, $location);
+        $form = $this->createForm(AddMarkerForm::class, $location);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $google_maps_geocode = new GoogleMapsGeocode('AIzaSyAmyYNlxuCGvftIhFlKACAqwRbBPDqtySI');
-            $location = $form->getData();
             $location = $google_maps_geocode->getLatLng($location->getAddress());
-            $form = $this->createForm(AddressForm::class, $location);
+            $data = array('latitude' => $location->getLatitude(),
+                'longitude' => $location->getLongitude(),
+                'address' => $location->getAddress(),
+                'markerType' => $form->getData()->getMarkerType(),
+                'markerColor' => $form->getData()->getMarkerColor());
+            $form = $this->createForm(AddMarkerForm::class, $location);
             $cookies = $request->cookies;
-            $data = array('latitude' => $location->getLatitude(), 'longitude' => $location->getLongitude(), 'address' => $location->getAddress());
+
             if ($cookies->has('locations')) {
                 $locations = json_decode($cookies->get('locations'));
                 array_push($locations, $data);

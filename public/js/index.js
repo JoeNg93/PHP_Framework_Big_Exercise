@@ -6,15 +6,37 @@ function initMap() {
         zoom: 13
     });
 
-    if (locations) {
+    if (locations.length) {
         var newlyAddedLocation = locations[locations.length - 1];
         map.setCenter({lat: newlyAddedLocation.lat, lng: newlyAddedLocation.lng});
-        locations.forEach(function (location) { addMarker(location) });
+        locations.forEach(function (location) {
+            addMarker(location)
+        });
     }
 }
 
 function addMarker(location) {
-    var marker = new google.maps.Marker({
+    var marker = null;
+    if (location.markerType) {
+        if (location.markerType === 'dot' || location.markerType === 'pushpin') {
+            marker = new google.maps.Marker({
+                position: {lat: location.lat, lng: location.lng},
+                animation: google.maps.Animation.DROP,
+                icon: 'https://maps.google.com/mapfiles/ms/micons/' + location.markerColor + '-' + location.markerType + '.png',
+                map: map
+            });
+            return;
+        } else {
+            marker = new google.maps.Marker({
+                position: {lat: location.lat, lng: location.lng},
+                animation: google.maps.Animation.DROP,
+                icon: 'https://maps.google.com/mapfiles/ms/micons/' + location.markerType + '.png',
+                map: map
+            });
+            return;
+        }
+    }
+    marker = new google.maps.Marker({
         position: {lat: location.lat, lng: location.lng},
         animation: google.maps.Animation.DROP,
         map: map
