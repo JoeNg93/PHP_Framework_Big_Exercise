@@ -2,13 +2,49 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\LocationRepository")
+ */
 class Location
 {
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     */
+    protected $id;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
     protected $address;
+
+    /**
+     * @ORM\Column(type="float")
+     */
     protected $latitude;
+
+    /**
+     * @ORM\Column(type="float")
+     */
     protected $longitude;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
     protected $markerColor;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
     protected $markerType;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $info;
 
     /**
      * @return mixed
@@ -88,5 +124,29 @@ class Location
     public function setMarkerType($markerType): void
     {
         $this->markerType = $markerType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInfo()
+    {
+        return $this->info;
+    }
+
+    /**
+     * @param mixed $info
+     */
+    public function setInfo($info): void
+    {
+        $this->info = $info;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 }

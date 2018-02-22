@@ -25,7 +25,6 @@ function addMarker(location) {
                 icon: 'https://maps.google.com/mapfiles/ms/micons/' + location.markerColor + '-' + location.markerType + '.png',
                 map: map
             });
-            return;
         } else {
             marker = new google.maps.Marker({
                 position: {lat: location.lat, lng: location.lng},
@@ -33,12 +32,13 @@ function addMarker(location) {
                 icon: 'https://maps.google.com/mapfiles/ms/micons/' + location.markerType + '.png',
                 map: map
             });
-            return;
         }
     }
-    marker = new google.maps.Marker({
-        position: {lat: location.lat, lng: location.lng},
-        animation: google.maps.Animation.DROP,
-        map: map
+
+    marker.addListener('click', function () {
+        var infowindow = new google.maps.InfoWindow({
+            content: "Lat: " + location.lat + " - Lng: " + location.lng + " - Info: " + location.info
+        });
+        infowindow.open(map, marker);
     });
 }
