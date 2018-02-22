@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% if form is defined %}
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+
+        {% if distance is defined %}
+            <p><b>Distance</b>: {{ distance }} km</p>
+        {% endif %}
+
+        <p>Wanna add more markers? Back to <a href="{{ path("index") }}">Home</a></p>
+    {% else %}
+        <p>
+            You haven't add any markers, please go back to <a href="{{ path("index") }}">Home</a> to add some markers.
+        </p>
+    {% endif %}
+{% endblock %}
