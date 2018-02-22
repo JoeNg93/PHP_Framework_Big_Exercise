@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/index.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% if form is defined %}
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+
+        <p>Wanna add more markers? Back to <a href="{{ path("index") }}">Home</a></p>
+
+        {% if estimatedDistance is defined %}
+            <div id="map" class="column is-8 is-offset-2 h-50"></div>
+            <p class="tc mt2 f4">Distance: {{ estimatedDistance }}</p>
+            <p class="tc f4">Time: {{ estimatedTime }}</p>
+            {% for direction in directions %}
+                <div class="column is-8 is-offset-2">
+                    <div class="message is-link">
+                        <div class="message-header">
+                            <p>{{ direction.distance.text }} - {{ direction.duration.text }}</p>
+                        </div>
+                        <div class="message-body">
+                            {{ direction.html_instructions|raw }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% else %}
+        <p>
+            You haven't add any markers, please go back to <a href="{{ path("index") }}">Home</a> to add some markers.
+        </p>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {% if estimatedDistance is defined %}
+        <script>
+            var from = {
+                lat: {{ startLocation.lat }},
+                lng: {{ startLocation.lng }}
+            };
+            var to = {
+                lat: {{ endLocation.lat }},
+                lng: {{ endLocation.lng }}
+            };
+        </script>
+        <script
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzyeRbwaJmvWe_R4b7j4R15Lc8fcw16B0&callback=initMap"
+                async defer></script>
+        <script src="{{ asset('js/direction.js') }}"></script>
+    {% endif %}
+{% endblock %}

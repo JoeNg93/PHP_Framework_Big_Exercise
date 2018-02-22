@@ -2,20 +2,21 @@
 
 namespace App\Controller;
 
-use App\Utils\GoogleMapsDistanceService;
+use App\Utils\GoogleMapsDirectionService;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class DistanceController extends Controller
+class DirectionController extends Controller
 {
     /**
-     * @Route("/distance", name="get_distance")
+     * @Route("/direction", name="get_direction")
      */
-    public function get_distance(Request $request)
+    public function get_direction(Request $request)
     {
         $cookies = $request->cookies;
         if ($cookies->has('locations')) {
@@ -29,7 +30,7 @@ class DistanceController extends Controller
             $form = $this->createFormBuilder($defaultFormData)
                 ->add('From', ChoiceType::class, array('choices' => $marker_choices))
                 ->add('To', ChoiceType::class, array('choices' => $marker_choices))
-                ->add('Get Distance', SubmitType::class)
+                ->add('Get Direction', SubmitType::class)
                 ->getForm();
 
             $form->handleRequest($request);
@@ -37,16 +38,22 @@ class DistanceController extends Controller
             if ($form->isSubmitted() && $form->isValid()) {
                 $location1 = json_decode($form->get('From')->getData());
                 $location2 = json_decode($form->get('To')->getData());
-                $googleMapsDistanceService = new GoogleMapsDistanceService('AIzaSyAYvkGf5VVaavgfc0Vw2jDwtzYEaspD7TU');
-                $distance = $googleMapsDistanceService->getDistance($location1->latitude, $location1->longitude,
+                $googleMapsDistanceService = new GoogleMapsDirectionService('AIzaSyAxx5iOJxd6LRQutCIJwOg4pdqmLqy3LVg');
+                $direction = $googleMapsDistanceService->getDirection($location1->latitude, $location1->longitude,
                     $location2->latitude, $location2->longitude);
-                return $this->render("distance/index.html.twig", array('form' => $form->createView(),
-                    'distance' => $distance / 1000));
+                return $this->render("direction/index.html.twig", array(
+                    'form' => $form->createView(),
+                    'estimatedDistance' => $direction->routes[0]->legs[0]->distance->text,
+                    'estimatedTime' => $direction->routes[0]->legs[0]->duration->text,
+                    'directions' => $direction->routes[0]->legs[0]->steps,
+                    'startLocation' => $direction->routes[0]->legs[0]->start_location,
+                    'endLocation' => $direction->routes[0]->legs[0]->end_location
+                ));
             }
 
-            return $this->render("distance/index.html.twig", array('form' => $form->createView()));
+            return $this->render("direction/index.html.twig", array('form' => $form->createView()));
         } else {
-            return $this->render("distance/index.html.twig");
+            return $this->render("direction/index.html.twig");
         }
     }
 }
