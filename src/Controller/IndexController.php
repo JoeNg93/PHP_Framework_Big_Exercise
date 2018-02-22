@@ -25,12 +25,6 @@ class IndexController extends Controller
      */
     public function index(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $repository = $this->getDoctrine()->getRepository(Location::class);
-
-//        $locations = $repository->findAll();
-
         $location = new Location();
 
         $form = $this->createForm(AddMarkerForm::class, $location);
@@ -43,36 +37,14 @@ class IndexController extends Controller
             $location->setMarkerColor($form->getData()->getMarkerColor());
             $location->setMarkerType($form->getData()->getMarkerType());
             $location->setInfo($form->getData()->getInfo());
+            $em = $this->getDoctrine()->getManager();
             $em->persist($location);
             $em->flush();
-
-            $data = array('latitude' => $location->getLatitude(),
-                'longitude' => $location->getLongitude(),
-                'address' => $location->getAddress(),
-                'markerType' => $location->getMarkerType(),
-                'markerColor' => $location->getMarkerColor(),
-                'info' => $location->getInfo());
-            $form = $this->createForm(AddMarkerForm::class, $location);
-            $cookies = $request->cookies;
-
-            if ($cookies->has('locations')) {
-                $locations = json_decode($cookies->get('locations'));
-                array_push($locations, $data);
-            } else {
-                $locations = [];
-                array_push($locations, $data);
-            }
-            $response = $this->render("home/index.html.twig", array('form' => $form->createView(), 'locations' => $locations));
-            $response->headers->setCookie(new Cookie('locations', json_encode($locations)));
-            return $response;
         }
 
-        $cookies = $request->cookies;
-        if ($cookies->has('locations')) {
-            $locations = json_decode($cookies->get('locations'));
-            return $this->render("home/index.html.twig", array('form' => $form->createView(), 'locations' => $locations));
-        } else {
-            return $this->render("home/index.html.twig", array('form' => $form->createView()));
-        }
+        $repository = $this->getDoctrine()->getRepository(Location::class);
+        $locations = $repository->findAll();
+
+        return $this->render('home/index.html.twig', array('form' => $form->createView(), 'locations' => $locations));
     }
 }

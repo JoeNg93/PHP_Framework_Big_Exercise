@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use App\Entity\Location;
 
 class DirectionController extends Controller
 {
@@ -18,13 +19,13 @@ class DirectionController extends Controller
      */
     public function get_direction(Request $request)
     {
-        $cookies = $request->cookies;
-        if ($cookies->has('locations')) {
-            $locations = json_decode($cookies->get('locations'));
+        $repository = $this->getDoctrine()->getRepository(Location::class);
+        $locations = $repository->findAll();
+        if (count($locations) > 0) {
             $marker_choices = array();
             foreach ($locations as $location) {
-                $marker_choices[$location->address] = json_encode(array('latitude' => $location->latitude,
-                    'longitude' => $location->longitude));
+                $marker_choices[$location->getAddress()] = json_encode(array('latitude' => $location->getLatitude(),
+                    'longitude' => $location->getLongitude()));
             }
             $defaultFormData = array();
             $form = $this->createFormBuilder($defaultFormData)
